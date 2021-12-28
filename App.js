@@ -1,17 +1,15 @@
 import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
   TextInput,
   Button,
   Picker,
   ScrollView,
-  
+
 } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -334,7 +332,7 @@ const FirebaseCheck = () => {
 };
 const UserDashboard = ({ navigation }) => {
   const [userdata, setuserdata] = React.useState("");
-  
+
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem("@loggedin_user");
@@ -348,7 +346,7 @@ const UserDashboard = ({ navigation }) => {
   };
   useEffect(() => {
     getData();
-  },[]);
+  }, []);
   return (
     <View>
       <Text>NAME: {userdata.email}</Text>
@@ -377,15 +375,15 @@ const UserDashboard = ({ navigation }) => {
 
 
 const JobPosting = () => {
-  const [jobtype,setjobtype] = React.useState("Remote");
-  
+  const [jobtype, setjobtype] = React.useState("Remote");
+
   return (
     <View style={stylesheet.container}>
       <View style={{ flexDirection: "row", margin: 10 }}>
         <Text style={stylesheet.heading}>Company: </Text>
         <Text >Image Here</Text>
       </View>
-      <ScrollView style={{width:350,}}>
+      <ScrollView style={{ width: 350, }}>
         <Text style={stylesheet.textinputheading}>JOB TYPE:</Text>
         <Picker
           selectedValue={jobtype}
@@ -402,31 +400,31 @@ const JobPosting = () => {
         <TextInput placeholder="Java Developer" style={stylesheet.input} />
         <Text style={stylesheet.textinputheading}>Description: </Text>
         <TextInput multiline
-        numberOfLines={4} placeholder=" description ..." style={[stylesheet.input,{width:300,height:300}]} />
-        
+          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
+
         <Text style={stylesheet.textinputheading}>Required Qualification: </Text>
         <TextInput multiline
-        numberOfLines={4} placeholder=" description ..." style={[stylesheet.input,{width:300,height:300}]} />
+          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
         <Text style={stylesheet.textinputheading}>Responsibilities: </Text>
         <TextInput multiline
-        numberOfLines={4} placeholder=" description ..." style={[stylesheet.input,{width:300,height:300}]} />
+          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
 
       </ScrollView>
-      
+
 
       <TouchableOpacity
-          onPress={() => {
-          }}
+        onPress={() => {
+        }}
+      >
+        <Text
+          style={[
+            stylesheet.button_initial,
+            { backgroundColor: "#42EAB7", color: "#344161" },
+          ]}
         >
-          <Text
-            style={[
-              stylesheet.button_initial,
-              { backgroundColor: "#42EAB7", color: "#344161" },
-            ]}
-          >
-            POST JOB
-          </Text>
-        </TouchableOpacity>
+          POST JOB
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -445,7 +443,7 @@ const App = () => {
   };
   useEffect(() => {
     getData();
-  },[]);
+  }, []);
   return (
     <NavigationContainer>
       {!isloggedin && (
@@ -486,7 +484,7 @@ const stylesheet = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     marginBottom: 10,
-    marginTop:10,
+    marginTop: 10,
   },
   heading: {
     width: 250,
@@ -501,7 +499,7 @@ const stylesheet = StyleSheet.create({
   input: {
     backgroundColor: "#bdcbe1",
     borderRadius: 10,
-    padding:10,
+    padding: 10,
     width: 200,
     height: 60,
     margin: 10,
@@ -509,8 +507,8 @@ const stylesheet = StyleSheet.create({
     textAlignVertical: 'top'
 
   },
-  textinputheading:{
-    fontSize:30,
+  textinputheading: {
+    fontSize: 30,
 
   }
 });
