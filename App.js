@@ -15,6 +15,7 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import JobPosting from "./Posting";
 
 const Stack = createNativeStackNavigator();
 
@@ -354,7 +355,7 @@ const UserDashboard = ({ navigation }) => {
 
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("JobPosting");
+          navigation.navigate("JobPosting",{id:userdata.user_id});
         }}
       >
         <Text
@@ -371,63 +372,6 @@ const UserDashboard = ({ navigation }) => {
 };
 
 
-
-
-
-const JobPosting = () => {
-  const [jobtype, setjobtype] = React.useState("Remote");
-
-  return (
-    <View style={stylesheet.container}>
-      <View style={{ flexDirection: "row", margin: 10 }}>
-        <Text style={stylesheet.heading}>Company: </Text>
-        <Text >Image Here</Text>
-      </View>
-      <ScrollView style={{ width: 350, }}>
-        <Text style={stylesheet.textinputheading}>JOB TYPE:</Text>
-        <Picker
-          selectedValue={jobtype}
-          style={{ height: 80, width: 150 }}
-          onValueChange={(itemValue, itemIndex) => setjobtype(itemValue)}
-        >
-          <Picker.Item label="Remote" value="Remote" />
-          <Picker.Item label="Full-Time" value="FullTime" />
-        </Picker>
-
-        <Text style={stylesheet.textinputheading}>Salary Range: </Text>
-        <TextInput placeholder="$0 - $6000 " style={stylesheet.input} />
-        <Text style={stylesheet.textinputheading}>Job Heading: </Text>
-        <TextInput placeholder="Java Developer" style={stylesheet.input} />
-        <Text style={stylesheet.textinputheading}>Description: </Text>
-        <TextInput multiline
-          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
-
-        <Text style={stylesheet.textinputheading}>Required Qualification: </Text>
-        <TextInput multiline
-          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
-        <Text style={stylesheet.textinputheading}>Responsibilities: </Text>
-        <TextInput multiline
-          numberOfLines={4} placeholder=" description ..." style={[stylesheet.input, { width: 300, height: 300 }]} />
-
-      </ScrollView>
-
-
-      <TouchableOpacity
-        onPress={() => {
-        }}
-      >
-        <Text
-          style={[
-            stylesheet.button_initial,
-            { backgroundColor: "#42EAB7", color: "#344161" },
-          ]}
-        >
-          POST JOB
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
 const App = () => {
   const [isloggedin, setloggedin] = React.useState(false);
   const getData = async () => {
