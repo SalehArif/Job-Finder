@@ -10,6 +10,9 @@ let val = {
       "emp_pass": "testing123",
     },
   }
+
+
+  
 for ( a in val)
 {
     console.log(val[a].emp_email);
