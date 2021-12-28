@@ -15,6 +15,7 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Jobs from "./components/jobs_display";
 
 const Stack = createNativeStackNavigator();
 
@@ -366,6 +367,20 @@ const UserDashboard = ({ navigation }) => {
           Post Data
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("JobList");
+        }}
+      >
+        <Text
+          style={[
+            stylesheet.button_initial,
+            { backgroundColor: "orange", color: "white" },
+          ]}
+        >
+          Jobs Listing
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -461,6 +476,7 @@ const App = () => {
       {isloggedin && (
         <Stack.Navigator initialRouteName="UserDashboard">
           <Stack.Screen name="UserDashboard" component={UserDashboard} />
+          <Stack.Screen name="JobList" component={Jobs} />
           <Stack.Screen name="JobPosting" component={JobPosting} />
         </Stack.Navigator>
       )}
