@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, Text } from 'react-native';
+import { View, StyleSheet, FlatList, Text, ScrollView } from 'react-native';
 import {
     Chip,
     ListItem,
@@ -123,37 +123,41 @@ const Jobs = () => {
 
     return (
         <View style={styles.container}>
-            <Avatar
-                size={64}
-                rounded
-                icon={{
-                    name: 'person',
-                    type: 'material',
-                    color: '#05a',
-                }}
-                containerStyle={{
-                    borderColor: 'grey',
-                    borderStyle: 'solid',
-                    borderWidth: 3,
-                    alignSelf: 'flex-start',
-                    marginLeft: 15,
-                }}
-            />
-            <SearchBar
-                placeholder="Search Jobs"
-                onChangeText={updateSearch}
-                value={search}
-                lightTheme
-                round
-                containerStyle={{
-                    borderRadius: 20,
-                    padding: 4,
-                    margin: 10,
-                    width: 320,
-                }}
-                inputContainerStyle={{ backgroundColor: '#333' }}
-            />
-            <FlatList data={list} renderItem={render} keyExtractor={keyExtractor} />
+            <ScrollView>
+
+                <Avatar
+                    size={64}
+                    rounded
+                    icon={{
+                        name: 'person',
+                        type: 'material',
+                        color: '#05a',
+                    }}
+                    containerStyle={{
+                        borderColor: 'grey',
+                        borderStyle: 'solid',
+                        borderWidth: 3,
+                        alignSelf: 'flex-start',
+                        marginLeft: 15,
+                    }}
+                />
+                <SearchBar
+                    placeholder="Search Jobs"
+                    onChangeText={updateSearch}
+                    value={search}
+                    lightTheme
+                    round
+                    containerStyle={{
+                        borderRadius: 20,
+                        padding: 4,
+                        margin: 10,
+                        width: 320,
+                    }}
+                    inputContainerStyle={{ backgroundColor: '#333' }}
+                />
+                <FlatList data={list} renderItem={render} keyExtractor={keyExtractor} />
+
+            </ScrollView>
 
         </View>
     );
