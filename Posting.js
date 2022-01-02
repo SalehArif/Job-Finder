@@ -13,7 +13,8 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, useTheme, Text } from "react-native-elements";
+import { Button, useTheme, Text, Icon } from "react-native-elements";
+
 
 const JobPosting = ({navigation,route}) => {
   const [jobtype, setjobtype] = React.useState("Remote");
