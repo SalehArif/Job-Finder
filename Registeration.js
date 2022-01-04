@@ -9,15 +9,15 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Button
+  Button,
 } from "react-native";
 import { Header } from "react-native-elements";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import * as ImagePicker from 'expo-image-picker';
-import { Constants, Permissions } from 'expo';
+import * as ImagePicker from "expo-image-picker";
+import { Constants, Permissions } from "expo";
+import * as FileSystem from "expo-file-system";
 
-
-const Registeration = ({navigation}) => {
+const Registeration = ({ navigation }) => {
   const [email, setemail] = React.useState("");
   const [password, setpassword] = React.useState("");
   const [repeatpass, setrepeatpass] = React.useState("");
@@ -25,8 +25,8 @@ const Registeration = ({navigation}) => {
   const [error, seterror] = React.useState("");
   const [company, setcompany] = React.useState("");
   const [fullname, setfullname] = React.useState("");
-  const [image,setimage]=React.useState("");
-  const [formdata,setformdata]= React.useState();
+  const [image, setimage] = React.useState("");
+  const [logo,setlogo] =React.useState("");
 
   var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const validateFields = () => {
@@ -34,19 +34,14 @@ const Registeration = ({navigation}) => {
 
     if (mailformat.test(email)) {
       if (password == repeatpass && password !== "") {
-        if (fullname !== "")
-        {
-          if(type=="Employer" && company!=="")
-            return true;
-          else{
-            seterror(`${error}\n Please Fill all fields!`);  
+        if (fullname !== "") {
+          if (type == "Employer" && company == "") {
+            seterror(`${error}\n Please Filla all fields!`);
             return false;
-          }
-        }
-
-        else{
-          seterror(`${error}\n Please Fill all fields!`);  
-          return false
+          } else return true;
+        } else {
+          seterror(`${error}\n Please Fill all fields!`);
+          return false;
         }
       } else {
         seterror(`${error}\n Repeat password does not match!`);
@@ -68,6 +63,7 @@ const Registeration = ({navigation}) => {
             name: fullname,
             email: email,
             pass: password,
+            profilepic: image,
           }),
         };
 
@@ -90,7 +86,8 @@ const Registeration = ({navigation}) => {
             email: email,
             pass: password,
             company: company,
-            
+            companylogo: logo,
+            profilepic:image
           }),
         };
         fetch(
@@ -112,23 +109,38 @@ const Registeration = ({navigation}) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
+      aspect: [4, 3],
+      quality: 0.5,
     });
 
-    console.log(result);
+    let result64 = await FileSystem.readAsStringAsync(result.uri, {
+      encoding: "base64",
+    });
+    console.log(result64);
 
     if (!result.cancelled) {
-      setimage(result.uri);
+      setimage(`data:image/png;base64,${result64}`);
     }
   };
 
-  const upload = async ()=>{
-    let formData = new FormData();
-    formData.append('photo', { uri: image, name: 'company ' });
-    setformdata(formData);
+  const pickLogo = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
 
-  }
+    let result64 = await FileSystem.readAsStringAsync(result.uri, {
+      encoding: "base64",
+    });
+    console.log(result64);
+
+    if (!result.cancelled) {
+      setlogo(`data:image/png;base64,${result64}`);
+    }
+  };
 
   return (
     <View
@@ -164,15 +176,24 @@ const Registeration = ({navigation}) => {
       <ScrollView>
         {type == "Employer" ? (
           <>
-            
-           <View style={stylesheet.imageContainer}>
-              <Image
-                source={{uri:image}}
-                style={{ width: 200, height: 200 }}
-              />
-              <Button title="upload" onPress={()=>pickImage()}/> 
+            <View style={{ flexDirection: "row" }}>
+              <View style={stylesheet.imageContainer}>
+                <Text>Profile pic</Text>
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 150, height: 150, backgroundColor:"#e9e9e9" }}
+                />
+                <Button title="upload" onPress={() => pickImage()} />
+              </View>
+              <View style={stylesheet.imageContainer}>
+              <Text>Company Logo</Text>
+                <Image
+                  source={{ uri: logo }}
+                  style={{ width: 150, height: 150, backgroundColor:"#e9e9e9" }}
+                />
+                <Button title="upload" onPress={() => pickLogo()} />
+              </View>
             </View>
-
             <TextInput
               style={[stylesheet.input]}
               onChangeText={(val) => {
@@ -183,7 +204,17 @@ const Registeration = ({navigation}) => {
             />
           </>
         ) : (
-          <></>
+          <>
+            <View style={[stylesheet.imageContainer]}>
+            <Text>Profile pic</Text>
+
+              <Image
+                source={{ uri: image }}
+                style={{ width: 200, height: 150, backgroundColor:"#e9e9e9" }}
+                />
+              <Button title="upload" onPress={() => pickImage()} />
+            </View>
+          </>
         )}
         <TextInput
           style={[stylesheet.input]}
@@ -277,9 +308,8 @@ const stylesheet = StyleSheet.create({
     justifyContent: "center",
     // aspectRatio: 1,
     width: "30%",
-    marginBottom:"10%",
-    marginTop:"10%"
-
+    marginBottom: "10%",
+    marginTop: "10%",
   },
   input: {
     backgroundColor: "#bdcbe1",

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import {
   View,
-  //   Text,
+  
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -17,6 +17,7 @@ import { Button, useTheme, Text, Icon } from "react-native-elements";
 
 
 const JobPosting = ({navigation,route}) => {
+  const [userdata,setuserdata]=React.useState("");
   const [jobtype, setjobtype] = React.useState("Remote");
   const [salary,setsalary] = React.useState(0);
   const [jobheading,setjobheading] = React.useState("");
@@ -24,6 +25,7 @@ const JobPosting = ({navigation,route}) => {
   const [qualification,setqualification] =React.useState("");
   const [responsibilities,setresponsibilities] =React.useState("");
   const { theme } = useTheme();
+  
 
   const AddDatatofirebase = () => {
     var requestopt = {
@@ -31,9 +33,9 @@ const JobPosting = ({navigation,route}) => {
       body: JSON.stringify({
           postedby:route.params.id,
         jobtype:jobtype,
-        salary:salary,
-        jobheading:jobheading,
-        description:description,
+        job_salary:salary,
+        job_title:jobheading,
+        job_description:description,
         qualification:qualification,
         responsibilities:responsibilities,
       }),
@@ -51,6 +53,22 @@ const JobPosting = ({navigation,route}) => {
       .catch((error) => console.log("error : ", error));
   };
 
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@loggedin_user");
+      if (value !== null) {
+        const data = await JSON.parse(value);
+        
+        setuserdata(data);
+      }
+    } catch (e) {
+      console.log(`error : ${e}`);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <View style={stylesheet.container}>
       <View style={{ flexDirection: "row", margin: 10 }}>
@@ -61,13 +79,12 @@ const JobPosting = ({navigation,route}) => {
         >
           Company:
         </Text>
-        <Text
-          style={stylesheet.text}
-          h2
-          h2Style={{ color: theme?.colors?.primary }}
-        >
-          Image 2
-        </Text>
+        <Image
+              style={stylesheet.avatar}
+              source={{
+                uri: userdata.companylogo
+              }}
+            />
       </View>
       <ScrollView style={{ width: 350 }}>
         <Text style={[stylesheet.text, { color: "#5b1ed5" }]} h4>
@@ -80,6 +97,8 @@ const JobPosting = ({navigation,route}) => {
         >
           <Picker.Item label="Remote" value="Remote" />
           <Picker.Item label="Full-Time" value="FullTime" />
+          <Picker.Item label="Internship" value="Internship" />
+          <Picker.Item label="Part-Time" value="PartTime" />
         </Picker>
 
         <Text style={[stylesheet.text, { color: "#5b1ed5" }]} h4>
@@ -196,6 +215,15 @@ const stylesheet = StyleSheet.create({
     width: 120,
     marginLeft: "auto",
     marginRight: "auto",
+  },
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: "white",
+    marginBottom: 10,
+    marginRight:10
   },
 });
 

@@ -27,10 +27,40 @@ const Tab = createBottomTabNavigator();
 
 const Settings = ({ navigation, route }) => {
     const [userdata, setuserdata] = React.useState(true);
+
+    //viewing or disabling inputs
     const [emaildis, setemaildis] = React.useState(true);
     const [passdis, setpassdis] = React.useState(true);
     const [fulldis, setfulldis] = React.useState(true);
     const [securepass,setsecurepass]= React.useState(true);
+
+    //storing data
+    const [email,setemail]= React.useState();
+    const [pass,setpass]= React.useState();
+    const [name,setname]= React.useState();
+
+    const updatefields = () => {
+      var requestopt = {
+        method: "PATCH",
+        body: JSON.stringify({
+          email:email,
+          pass:pass,
+          name:name
+        }),
+      };
+      fetch(
+        `https://jobfinder-80af8-default-rtdb.firebaseio.com/Employers/${userdata.user_id}.json`,
+        requestopt
+      )
+        .then((response) => response.json)
+        .then((result) => {
+          console.log(result);
+          alert("Data Updated Successfully");
+          navigation.goBack();
+        })
+        .catch((error) => console.log("error : ", error));
+    };
+
     const clearAll = async () => {
       try {
         await AsyncStorage.clear();
@@ -45,12 +75,16 @@ const Settings = ({ navigation, route }) => {
       headerRight: () => <Button onPress={() => clearAll()} title="Logout" />,
       headerShown: false,
     });
+
+
     const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("@loggedin_user");
         if (value !== null) {
           const data = await JSON.parse(value);
-          setuserdata(data);
+          setemail(data.email);
+          setpass(data.pass);
+          setname(data.name);
         }
       } catch (e) {
         console.log(`error : ${e}`);
@@ -62,13 +96,14 @@ const Settings = ({ navigation, route }) => {
     return (
       <View style={stylesheet.container}>
         <Text style={[stylesheet.heading, { alignContent: "center" }]}>
-          User Settings
+          {userdata.name}
         </Text>
         <Input
-          value={userdata.email}
+          value={email}
           leftIcon={{ type: "ionicon", name: "mail" }}
           style={{ paddingLeft: 20 }}
           disabled={emaildis}
+          onChangeText={setemail}
           rightIcon={
             <Ionicons
               name={"create-outline"}
@@ -78,10 +113,11 @@ const Settings = ({ navigation, route }) => {
           }
         />
         <Input
-          value={userdata.pass}
+          value={pass}
           secureTextEntry={securepass}
           
           leftIcon={{ type: "ionicon", name: "lock-closed" }}
+          onChangeText={setpass}
           style={{ paddingLeft: 20 }}
           disabled={passdis}
           rightIcon={
@@ -97,10 +133,11 @@ const Settings = ({ navigation, route }) => {
         />
         <Input
           
-          value={userdata.name}
+          value={name}
           leftIcon={{ type: "ionicon", name: "text" }}
           style={{ paddingLeft: 20 }}
           disabled={fulldis}
+          onChangeText={setname}
           rightIcon={
             <Ionicons
               name={"create-outline"}
@@ -112,7 +149,7 @@ const Settings = ({ navigation, route }) => {
   
         <TouchableOpacity
           onPress={() => {
-            //save
+            updatefields();
           }}
         >
           <Text
@@ -197,12 +234,20 @@ const EmployeeDashboard = ({ navigation, route }) => {
       <View>
         <View>
           <View style={stylesheet.headerContent}>
+            <View style={{flexDirection:'row'}}>
             <Image
               style={stylesheet.avatar}
               source={{
-                uri: "https://bootdey.com/img/Content/avatar/avatar6.png",
+                uri: userdata.profilepic
               }}
             />
+            <Image
+              style={stylesheet.avatar}
+              source={{
+                uri: userdata.companylogo
+              }}
+            />
+            </View>
   
             <Text style={stylesheet.name}>{userdata.name} </Text>
             <Text style={stylesheet.userInfo}>{userdata.email} </Text>
@@ -299,10 +344,11 @@ const EmployeeDashboard = ({ navigation, route }) => {
     avatar: {
       width: 130,
       height: 130,
-      borderRadius: 63,
+      borderRadius: 20,
       borderWidth: 4,
       borderColor: "white",
       marginBottom: 10,
+      marginRight:10
     },
     name: {
       fontSize: 22,

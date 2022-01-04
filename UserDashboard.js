@@ -180,6 +180,7 @@ const UserDashboard = ({ navigation, route }) => {
   };
   useEffect(() => {
     getData();
+    console.log(userdata.profilepic);
   }, []);
   return (
     <View>
@@ -187,12 +188,10 @@ const UserDashboard = ({ navigation, route }) => {
         <View style={stylesheet.headerContent}>
           <Image
             style={stylesheet.avatar}
-            source={{
-              uri: "https://bootdey.com/img/Content/avatar/avatar6.png",
-            }}
+            source={{uri: userdata.profilepic}}
           />
 
-          <Text style={stylesheet.name}>John Doe </Text>
+          <Text style={stylesheet.name}>{userdata.name} </Text>
           <Text style={stylesheet.userInfo}>{userdata.email} </Text>
           <Text style={stylesheet.userInfo}>Florida </Text>
         </View>
@@ -215,20 +214,6 @@ const UserDashboard = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("JobPosting", { id: userdata.user_id });
-            }}
-          >
-            <Text
-              style={[
-                stylesheet.button_initial,
-                { backgroundColor: "orange", color: "white" },
-              ]}
-            >
-              Post Job
-            </Text>
-          </TouchableOpacity>
         </ScrollView>
       </View>
     </View>
@@ -283,7 +268,7 @@ const stylesheet = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 130,
+    width: 120,
     height: 130,
     borderRadius: 63,
     borderWidth: 4,
