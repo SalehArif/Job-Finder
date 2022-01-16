@@ -9,17 +9,14 @@ import {
   Button,
   Picker,
   ScrollView,
-  ScrollViewBase,
+
 } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Jobs from "./components/jobs_display";
 import JobPosting from "./Posting";
-import UserNavigator from "./UserDashboard";
-import Registeration from "./Registeration";
-import EmployerNavigator from "./EmployerNavigator";
-import Ionicons from "react-native-vector-icons/Ionicons";
 
 const Stack = createNativeStackNavigator();
 
@@ -80,6 +77,107 @@ const InitialScreen = ({ navigation }) => {
   );
 };
 
+const Registeration = () => {
+  const [email, setemail] = React.useState("");
+  const [password, setpassword] = React.useState("");
+  const [repeatpass, setrepeatpass] = React.useState("");
+  const [type, settype] = React.useState("Employee");
+
+  const postdata = () => {
+    if (password === repeatpass) {
+      var requestopt = {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          pass: password,
+        }),
+      };
+      if (type == "Employee") {
+        fetch(
+          "https://jobfinder-80af8-default-rtdb.firebaseio.com/Employees.json",
+          requestopt
+        )
+          .then((response) => response.json)
+          .then((result) => {
+            console.log(result);
+            alert("User Successfully created");
+          })
+          .catch((error) => console.log("error : ", error));
+      } else if (type == "Employer") {
+        fetch(
+          "https://jobfinder-80af8-default-rtdb.firebaseio.com/Employers.json",
+          requestopt
+        )
+          .then((response) => response.json)
+          .then((result) => {
+            console.log(result);
+            alert("Employer Successfully created");
+          })
+          .catch((error) => console.log("error : ", error));
+      }
+    } else {
+      alert("repeat pass does not match");
+    }
+  };
+
+  return (
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text style={stylesheet.heading}>Sign Up</Text>
+      <TouchableOpacity
+        onPress={() => {
+          type == "Employee" ? settype("Employer") : settype("Employee");
+        }}
+      >
+        <Text style={{ fontSize: 40, color: "black", marginBottom: 40 }}>
+          {type}
+        </Text>
+      </TouchableOpacity>
+      <TextInput
+        style={[stylesheet.input]}
+        onChangeText={(val) => {
+          setemail(val);
+        }}
+        placeholder="e-mail"
+      />
+      <TextInput
+        style={[stylesheet.input]}
+        onChangeText={(val) => {
+          setpassword(val);
+        }}
+        placeholder="password"
+      />
+      <TextInput
+        style={[stylesheet.input]}
+        onChangeText={(val) => {
+          setrepeatpass(val);
+        }}
+        placeholder="repeat password"
+      />
+      <TouchableOpacity
+        onPress={() => {
+          postdata();
+        }}
+      >
+        <Text
+          style={[
+            stylesheet.button_initial,
+            { backgroundColor: "#1C58F2", color: "#ffff" },
+          ]}
+        >
+          Sign up
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const Login = ({ route }) => {
   const [email, setemail] = React.useState("");
   const [password, setpassword] = React.useState("");
@@ -112,24 +210,18 @@ const Login = ({ route }) => {
   };
   const authenticate = async () => {
     const data = await getdata();
-    for (let key in data) {
-      // console.log(JSON.stringify(tomerge));
+    for (key in data) {
+      console.log(data[key].email);
 
       if (data[key].email == email) {
         if (data[key].pass == password) {
           alert("Authenticated");
-          let a= {
-            user_id:key
-          }
-          let merged = Object.assign(data[key],a);
-          storeData(merged);
+          storeData({
+            user_id: key,
+            email: data[key].email,
+            pass: data[key].pass,
+          });
           route.params.changeloginstate(true);
-
-          //showing different screen for employer
-          type == "Employee"
-            ? route.params.changeisEmployee(true)
-            : route.params.changeisEmployee(false);
-
           return;
         } else {
           alert("pasword does not match");
@@ -152,24 +244,14 @@ const Login = ({ route }) => {
     >
       <Text style={stylesheet.heading}>Login</Text>
       <TouchableOpacity
-          onPress={() => {
-            type == "Employee" ? settype("Employer") : settype("Employee");
-          }}
-          style={{flexDirection:'row'}}
-        >
-          <Ionicons
-            name={"chevron-back-circle-outline"}
-            size={50}
-            
-          />
-          <Text style={{ fontSize: 40, color: "black", marginBottom: 40 }}>
-            {type}
-          </Text>
-          <Ionicons
-            name={"chevron-forward-circle-outline"}
-            size={50}
-          />
-        </TouchableOpacity>
+        onPress={() => {
+          type == "Employee" ? settype("Employer") : settype("Employee");
+        }}
+      >
+        <Text style={{ fontSize: 40, color: "black", marginBottom: 40 }}>
+          {type}
+        </Text>
+      </TouchableOpacity>
       <TextInput
         style={[stylesheet.input]}
         onChangeText={(val) => {
@@ -178,7 +260,6 @@ const Login = ({ route }) => {
         placeholder="e-mail"
       />
       <TextInput
-        secureTextEntry={true}
         style={[stylesheet.input]}
         onChangeText={(val) => {
           setpassword(val);
@@ -251,18 +332,69 @@ const FirebaseCheck = () => {
     </View>
   );
 };
+const UserDashboard = ({ navigation }) => {
+  const [userdata, setuserdata] = React.useState("");
 
-const App = () => {
-  const [isloggedin, setloggedin] = React.useState(false);
-  const [isEmployee, setisEmployee] = React.useState(false);
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem("@loggedin_user");
       if (value !== null) {
         const data = await JSON.parse(value);
-        setloggedin(true);
-      } else {
-        setloggedin(false);
+        setuserdata(data);
+      }
+    } catch (e) {
+      console.log(`error : ${e}`);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+  return (
+    <View>
+      <Text>NAME: {userdata.email}</Text>
+      <Text>Password: {userdata.pass}</Text>
+
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("JobPosting", { id: userdata.user_id });
+        }}
+      >
+        <Text
+          style={[
+            stylesheet.button_initial,
+            { backgroundColor: "orange", color: "white" },
+          ]}
+        >
+          Post Data
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("JobList");
+        }}
+      >
+        <Text
+          style={[
+            stylesheet.button_initial,
+            { backgroundColor: "orange", color: "white" },
+          ]}
+        >
+          Jobs Listing
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+
+const App = () => {
+  const [isloggedin, setloggedin] = React.useState(false);
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@loggedin_user");
+      if (value !== null) {
+        const data = await JSON.parse(value);
+        setloggedin(true)
       }
     } catch (e) {
       console.log(`error : ${e}`);
@@ -281,31 +413,14 @@ const App = () => {
           <Stack.Screen
             name="Login"
             component={Login}
-            initialParams={{
-              changeloginstate: setloggedin,
-              changeisEmployee: setisEmployee,
-            }}
+            initialParams={{ changeloginstate: setloggedin }}
           />
         </Stack.Navigator>
       )}
-      {isloggedin && isEmployee && (
+      {isloggedin && (
         <Stack.Navigator initialRouteName="UserDashboard">
-          <Stack.Screen
-            name="UserDashboard"
-            component={UserNavigator}
-            initialParams={{ changeloginstate: setloggedin }}
-          />
-        </Stack.Navigator>
-      )}
-
-      {isloggedin && !isEmployee && (
-        <Stack.Navigator initialRouteName="EmployerDashboard">
-          <Stack.Screen
-            name="EmployerDashboard"
-            component={EmployerNavigator}
-            initialParams={{ changeloginstate: setloggedin }}
-
-          />
+          <Stack.Screen name="UserDashboard" component={UserDashboard} />
+          <Stack.Screen name="JobList" component={Jobs} />
           <Stack.Screen name="JobPosting" component={JobPosting} />
         </Stack.Navigator>
       )}
@@ -325,7 +440,7 @@ const stylesheet = StyleSheet.create({
     width: 250,
     height: 60,
     fontSize: 30,
-    borderRadius: 10,
+    borderRadius: 30,
     textAlign: "center",
     justifyContent: "center",
     marginBottom: 10,
@@ -338,7 +453,7 @@ const stylesheet = StyleSheet.create({
     justifyContent: "center",
     textAlign: "center",
     fontSize: 60,
-    marginBottom: "10%",
+    marginBottom: 100,
     color: "#bdcbe1",
   },
   input: {
@@ -349,11 +464,13 @@ const stylesheet = StyleSheet.create({
     height: 60,
     margin: 10,
     fontSize: 20,
-    textAlignVertical: "top",
+    textAlignVertical: 'top'
+
   },
   textinputheading: {
     fontSize: 30,
-  },
+
+  }
 });
 
 export default App;
